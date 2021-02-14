@@ -2,4 +2,6 @@
 
 Rare little shits on the Ethereum blockchain.
 
-![Little Shits](/sample.png?raw=true)# littleshits
+![Little Shits](/sample.png?raw=true)
+
+Artwork by [Felicia Namikaze](https://twitter.com/whiteakatsuki)
