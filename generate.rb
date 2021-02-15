@@ -2,17 +2,17 @@
 # Run with ruby generate.rb
 # ImageMagick needs to be installed on the system
 
-def get_special_back_ids(bodypath, faceid, outfitid, accessoryid)
+def special_back_paths(bodypath, facepath, outfitpath, accessorypath)
   # Give wings to the demon
-  result = {0 => nil}
-  result[1] = "./artwork/special_backs/1.png" if outfitid.to_i == 12
+  result = [nil]
+  result << "./artwork/special_backs/1.png" if outfitpath && outfitpath.include?('/12.png')
   return result
 end
 
-def get_special_front_ids(bodypath, faceid, outfitid, accessoryid)
+def special_front_paths(bodypath, facepath, outfitpath, accessorypath)
   # Give the staff to the sorcerer
-  result = {0 => nil}
-  result[1] = "./artwork/special_fronts/1.png" if outfitid.to_i == 7
+  result = [nil]
+  result << "./artwork/special_fronts/1.png" if outfitpath && outfitpath.include?('/7.png')
   return result
 end
 
@@ -23,31 +23,30 @@ for layer in layers
   Dir.glob("./artwork/#{layer}/*.png") do |path|
     matches = path.match /\.\/artwork\/#{layer}\/(?<partid>.+?)\.png/
     
-    parts[layer] ||= {}
-    parts[layer][matches[:partid]] = path
+    parts[layer] ||= []
+    parts[layer] << path
   end
 end
 
-parts['outfits']['0'] = nil
-parts['accessories']['0'] = nil
+parts['outfits'] << nil
+parts['accessories'] << nil
 
 `mkdir -p generated`
+id = 0
 generated_files = {}
-for bodyid, bodypath in parts['bodies']
-  for faceid, facepath in parts['faces']
-    for outfitid, outfitpath in parts['outfits']
-      for accessoryid, accessorypath in parts['accessories']
-        special_back_ids = get_special_back_ids(bodyid, faceid, outfitid, accessoryid)
-        special_front_ids = get_special_front_ids(bodyid, faceid, outfitid, accessoryid)
-        for special_back_id, special_back_path in special_back_ids
-          for special_front_id, special_front_path in special_front_ids
-            id = "#{special_back_id.to_s.rjust(2, '0')}#{bodyid.rjust(2, '0')}#{faceid.rjust(2, '0')}#{outfitid.rjust(2, '0')}#{accessoryid.rjust(2, '0')}#{special_front_id.to_s.rjust(2, '0')}" 
+for bodypath in parts['bodies']
+  for facepath in parts['faces']
+    for outfitpath in parts['outfits']
+      for accessorypath in parts['accessories']
+        for special_back_path in special_back_paths(bodypath, facepath, outfitpath, accessorypath)
+          for special_front_path in special_front_paths(bodypath, facepath, outfitpath, accessorypath)
+            id += 1
             paths = []
-            paths << special_back_path if special_back_id.to_i != 0
+            paths << special_back_path if special_back_path
             paths << bodypath << facepath
-            paths << outfitpath if outfitid.to_i != 0
-            paths << accessorypath if accessoryid.to_i != 0
-            paths << special_front_path if special_front_id.to_i != 0
+            paths << outfitpath if outfitpath
+            paths << accessorypath if accessorypath
+            paths << special_front_path if special_front_path
             arg = paths.map { |path| "#{path} -composite "}.join
             path = "./generated/#{id}.png"
             `convert -size 1024x1024 xc:none #{arg} #{path}`
