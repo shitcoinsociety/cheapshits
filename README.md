@@ -1,6 +1,6 @@
 # Little Shits
 
-![Little Shits](/sample.png?raw=true)
+![Cheap Shits](/sample.png?raw=true)
 
 Artwork by [Felicia Namikaze](https://twitter.com/whiteakatsuki)
 
